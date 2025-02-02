@@ -1,0 +1,17 @@
+{
+    "name": "Odeio docker <3",
+    "dockerFile": "Dockerfile",
+    "runArgs": [
+        "--privileged"
+    ],
+    "remoteEnv": {
+        "DOCKER_TLS_VERIFY": "1",
+        "DOCKER_HOST": "tcp://localhost:2376",
+        "DOCKER_CERT_PATH": "/certs"
+    },
+    "mounts": [
+        "source=${localWorkspaceFolder}/.devcontainer/certs,target=/certs,type=bind,readonly"
+    ],
+    "postCreateCommand": "echo 'criado'; dockerd --host=unix:///var/run/docker.sock --host=tcp://localhost:2376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server-cert.pem --tlskey=/certs/server-key.pem & sleep 10 && docker version && echo 'happy hacking'",
+    "postStartCommand": "echo 'startado'; dockerd --host=unix:///var/run/docker.sock --host=tcp://localhost:2376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server-cert.pem --tlskey=/certs/server-key.pem & sleep 10 && echo 'happy hacking'"
+}
