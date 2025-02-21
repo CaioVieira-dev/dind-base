@@ -12,6 +12,23 @@
     "mounts": [
         "source=${localWorkspaceFolder}/.devcontainer/certs,target=/certs,type=bind,readonly"
     ],
-    "postCreateCommand": "echo 'criado'; dockerd --host=unix:///var/run/docker.sock --host=tcp://localhost:2376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server-cert.pem --tlskey=/certs/server-key.pem & sleep 10 && docker version && echo 'happy hacking'",
-    "postStartCommand": "echo 'startado'; dockerd --host=unix:///var/run/docker.sock --host=tcp://localhost:2376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server-cert.pem --tlskey=/certs/server-key.pem & sleep 10 && echo 'happy hacking'"
+    "forwardPorts": [
+        2375,
+        2376
+    ],
+    "portsAttributes": {
+        "2375": {
+            "label": "Docker API (unsecure)",
+            "protocol": "http"
+        },
+        "2376": {
+            "label": "Docker API (TLS)",
+            "protocol": "https"
+        }
+    },
+    "remoteUser": "vscode",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+    "workspaceFolder": "/workspace",
+    "postCreateCommand": "echo 'starting post create'; sudo rm -f /var/run/docker.pid && echo 'Removed docker.pid' && sudo dockerd --host=unix:///var/run/docker.sock --host=tcp://localhost:2376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server-cert.pem --tlskey=/certs/server-key.pem & sleep 10 && echo 'happy hacking'",
+    "postStartCommand": "echo 'starting post start'; if ! pgrep dockerd > /dev/null; then sudo rm -f /var/run/docker.pid && echo 'Removed docker.pid' && sudo dockerd --host=unix:///var/run/docker.sock --host=tcp://localhost:2376 --tlsverify --tlscacert=/certs/ca.pem --tlscert=/certs/server-cert.pem --tlskey=/certs/server-key.pem & fi; sleep 10 && echo 'happy hacking'"
 }
